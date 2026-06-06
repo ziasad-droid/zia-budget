@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Zia's Budget">
+<title>Zia's Budget</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0b14;
+    --card: #151321;
+    --border: #1e1b2e;
+    --text: #e8e3f5;
+    --muted: #5a5070;
+    --dim: #3a3050;
+    --green: #a8edcc;
+    --red: #e07b5a;
+    --yellow: #ffd580;
+    --blue: #7ab8e8;
+    --purple: #c9a0dc;
+    --pink: #f4a0b0;
+    --teal: #88d4ab;
+    --orange: #f0c97a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', system-ui, sans-serif; overflow-x: hidden; }
+  body { padding-bottom: env(safe-area-inset-bottom); }
+  button { font-family: inherit; cursor: pointer; border: none; outline: none; background: none; }
+  input { font-family: inherit; outline: none; border: none; background: transparent; color: var(--text); }
+  input::placeholder { color: var(--dim); }
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  #app { max-width: 480px; margin: 0 auto; padding: 0 16px; }
+
+  .screen { display: none; padding-top: 4px; padding-bottom: 100px; animation: slideUp 0.2s ease; }
+  .screen.active { display: block; }
+  @keyframes slideUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+  .page-title { padding: 24px 0 16px; }
+  .page-title .eyebrow { font-size: 11px; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+  .page-title h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+  .page-title p { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+  .card-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 12px; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+  .stat-card .label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+  .stat-card .value { font-size: 22px; font-weight: 700; }
+  .stat-card .sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  .bar-wrap { background: #1e1b2e; border-radius: 999px; overflow: hidden; }
+  .bar-fill { border-radius: 999px; transition: width 0.4s ease; }
+
+  .row { display: flex; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); gap: 10px; }
+  .row:last-child { border-bottom: none; }
+
+  .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .cat-btn { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 10px; text-align: left; transition: all 0.15s; }
+  .cat-btn.selected { border-color: var(--sel-color); background: var(--sel-bg); }
+  .cat-btn .cat-icon { font-size: 20px; margin-bottom: 4px; }
+  .cat-btn .cat-name { font-size: 12px; color: #9a92b0; }
+  .cat-btn.selected .cat-name { font-weight: 600; }
+  .cat-btn .cat-budget { font-size: 11px; color: var(--dim); margin-top: 2px; }
+
+  .amount-row { display: flex; align-items: center; gap: 8px; }
+  .amount-sym { font-size: 28px; font-weight: 300; color: var(--muted); }
+  .amount-input { font-size: 32px; font-weight: 700; width: 100%; }
+
+  .btn-primary { width: 100%; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 700; margin-bottom: 16px; transition: opacity 0.15s, transform 0.1s; }
+  .btn-primary:active { opacity: 0.8; transform: scale(0.98); }
+
+  .pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .pill-btn { padding: 8px 14px; border-radius: 999px; font-size: 12px; transition: all 0.15s; }
+
+  #nav { position: fixed; bottom: 0; left: 0; right: 0; background: #0f0e18; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; padding-bottom: calc(10px + env(safe-area-inset-bottom)); z-index: 100; }
+  .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px 16px; }
+  .nav-btn .nav-icon { font-size: 22px; }
+  .nav-btn .nav-label { font-size: 10px; color: var(--muted); font-weight: 400; letter-spacing: 0.05em; }
+  .nav-btn.active .nav-label { color: var(--green); font-weight: 600; }
+
+  #toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--green); color: #0c0b14; padding: 10px 20px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; opacity: 0; transition: all 0.2s ease; z-index: 999; pointer-events: none; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); }
+  .empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+  .empty-state small { font-size: 12px; margin-top: 4px; display: block; }
+
+  .delete-btn { color: var(--dim); font-size: 20px; padding: 2px 6px; flex-shrink: 0; }
+  .delete-btn:active { color: var(--red); }
+
+  .surplus-bar { border-radius: 12px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+
+  .icon-circle { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- HOME -->
+  <div id="screen-home" class="screen active">
+    <div class="page-title">
+      <div class="eyebrow" id="month-label"></div>
+      <h1>Zia's Budget</h1>
+    </div>
+
+    <div class="grid2">
+      <div class="stat-card">
+        <div class="label">Monthly Income</div>
+        <div class="value" style="color:var(--green)">$4,965</div>
+        <div class="sub">incl. $1,000 rent</div>
+      </div>
+      <div class="stat-card" id="remaining-card">
+        <div class="label">Left to Spend</div>
+        <div class="value" id="remaining-val">—</div>
+        <div class="sub" id="remaining-sub">remaining</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:500">Variable Spending</span>
+        <span style="font-size:13px;color:var(--muted)" id="spend-label">$0 / $1,334</span>
+      </div>
+      <div class="bar-wrap" style="height:8px">
+        <div class="bar-fill" id="spend-bar" style="height:8px;width:0%;background:var(--purple)"></div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">Fixed bills ($2,364) & savings ($630) excluded</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">This Month by Category</div>
+      <div id="cat-summary"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Savings Progress</div>
+      <div id="savings-summary"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Fixed Bills (auto every month)</div>
+      <div class="row"><span style="flex:1;font-size:13px;color:#9a92b0">Mortgage / Loan</span><span style="font-size:13px;color:var(--red)">$2,023</span></div>
+      <div class="row"><span style="flex:1;font-size:13px;color:#9a92b0">Allianz Insurance</span><span style="font-size:13px;color:var(--red)">$126</span></div>
+      <div class="row"><span style="flex:1;font-size:13px;color:#9a92b0">iiNet Internet</span><span style="font-size:13px;color:var(--red)">$75</span></div>
+      <div class="row"><span style="flex:1;font-size:13px;color:#9a92b0">Felix Mobile</span><span style="font-size:13px;color:var(--red)">$25</span></div>
+      <div class="row"><span style="flex:1;font-size:13px;color:#9a92b0">GloBird Energy</span><span style="font-size:13px;color:var(--red)">$80</span></div>
+      <div class="row"><span style="flex:1;font-size:13px;color:#9a92b0">Barwon Water</span><span style="font-size:13px;color:var(--red)">$35</span></div>
+      <div style="display:flex;justify-content:space-between;padding-top:10px">
+        <span style="font-size:13px;font-weight:600;color:var(--muted)">Total</span>
+        <span style="font-size:14px;font-weight:700;color:var(--red)">$2,364</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div id="screen-log" class="screen">
+    <div class="page-title">
+      <h1>Log Expense</h1>
+      <p>Tap a category then enter the amount</p>
+    </div>
+
+    <div class="cat-grid" id="cat-picker"></div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-label">Amount</div>
+      <div class="amount-row">
+        <span class="amount-sym">$</span>
+        <input class="amount-input" type="number" id="log-amt" placeholder="0.00" inputmode="decimal">
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-label">Note (optional)</div>
+      <input type="text" id="log-note" placeholder="e.g. Coles, 17by4 coffee..." style="width:100%;font-size:15px">
+    </div>
+
+    <button class="btn-primary" style="background:var(--green);color:#0c0b14" onclick="addExpense()">Add Expense</button>
+
+    <div class="card" id="recent-wrap" style="display:none">
+      <div class="card-label">This Month</div>
+      <div id="recent-list"></div>
+    </div>
+  </div>
+
+  <!-- SAVINGS -->
+  <div id="screen-savings" class="screen">
+    <div class="page-title">
+      <h1>Savings</h1>
+      <p>Track your three goals</p>
+    </div>
+
+    <div id="savings-goals"></div>
+
+    <div class="card">
+      <div class="card-label">Add a deposit</div>
+      <div class="pill-row" id="saving-picker"></div>
+      <div class="amount-row" style="margin-bottom:14px">
+        <span class="amount-sym">$</span>
+        <input class="amount-input" type="number" id="saving-amt" placeholder="0.00" inputmode="decimal" style="font-size:28px">
+      </div>
+      <button class="btn-primary" id="saving-btn" style="margin-bottom:0" onclick="addSaving()">Save Deposit</button>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div id="screen-history" class="screen">
+    <div class="page-title" style="display:flex;justify-content:space-between;align-items:flex-end">
+      <div>
+        <h1>History</h1>
+        <p id="history-count">0 transactions</p>
+      </div>
+      <button onclick="clearAll()" style="background:#1e1b2e;color:var(--red);padding:8px 14px;border-radius:999px;font-size:12px">Clear all</button>
+    </div>
+    <div class="card" id="history-list">
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <p>No expenses logged yet</p>
+        <small>Tap Log to add your first one</small>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div id="nav">
+  <button class="nav-btn active" onclick="goTo('home',this)">
+    <span class="nav-icon">🏠</span><span class="nav-label">Overview</span>
+  </button>
+  <button class="nav-btn" onclick="goTo('log',this)">
+    <span class="nav-icon">➕</span><span class="nav-label">Log</span>
+  </button>
+  <button class="nav-btn" onclick="goTo('savings',this)">
+    <span class="nav-icon">💰</span><span class="nav-label">Savings</span>
+  </button>
+  <button class="nav-btn" onclick="goTo('history',this)">
+    <span class="nav-icon">📋</span><span class="nav-label">History</span>
+  </button>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SPEND_CATS = [
+  { id:"groceries",  label:"Groceries",      icon:"🛒", budget:440,  color:"#f0c97a" },
+  { id:"transport",  label:"Transport",       icon:"🚗", budget:220,  color:"#7ab8e8" },
+  { id:"dining",     label:"Dining & Cafes",  icon:"☕", budget:290,  color:"#c9a0dc" },
+  { id:"shopping",   label:"Shopping",        icon:"🛍️", budget:190,  color:"#f4a0b0" },
+  { id:"health",     label:"Health & Vet",    icon:"💊", budget:75,   color:"#88d4ab" },
+  { id:"bills",      label:"Bills & Utils",   icon:"⚙️", budget:341,  color:"#e07b5a" },
+  { id:"other",      label:"Other",           icon:"📦", budget:100,  color:"#aaa"    },
+];
+
+const SAVINGS_GOALS = [
+  { id:"mounjaro", label:"Mounjaro Fund",     icon:"💉", target:5115, monthly:430, color:"#a8edcc" },
+  { id:"holiday",  label:"Holiday — Overseas",icon:"✈️", target:1200, monthly:100, color:"#ffd580" },
+  { id:"emergency",label:"Emergency Fund",    icon:"🛡️", target:1200, monthly:100, color:"#f4a0b0" },
+];
+
+const VARIABLE_BUDGET = 1334;
+const MONTHLY_INCOME  = 4965;
+
+function getMonthKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()}`;
+}
+
+function load(key, def) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch { return def; }
+}
+function save(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+}
+
+let expenses = load("zia_exp_v3", []);
+let savings  = load("zia_sav_v3", { mounjaro:0, holiday:0, emergency:0 });
+let selectedCat = "groceries";
+let selectedSaving = "mounjaro";
+
+function fmt(n) { return Math.round(n).toLocaleString("en-AU"); }
+function fmtD(n) { return parseFloat(n).toFixed(2); }
+
+function monthlyExpenses() {
+  const mk = getMonthKey();
+  return expenses.filter(e => e.month === mk);
+}
+
+function catSpend(id) {
+  return monthlyExpenses().filter(e => e.cat === id).reduce((s,e) => s + e.amount, 0);
+}
+
+function totalSpent() {
+  return monthlyExpenses().reduce((s,e) => s + e.amount, 0);
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+function goTo(screen, btn) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("screen-" + screen).classList.add("active");
+  if (btn) btn.classList.add("active");
+  renderAll();
+}
+
+function renderHome() {
+  document.getElementById("month-label").textContent =
+    new Date().toLocaleDateString("en-AU", { month:"long", year:"numeric" });
+
+  const spent = totalSpent();
+  const remaining = VARIABLE_BUDGET - spent;
+  const remCard = document.getElementById("remaining-card");
+  const remVal  = document.getElementById("remaining-val");
+  const remSub  = document.getElementById("remaining-sub");
+  remVal.textContent = "$" + fmt(Math.abs(remaining));
+  remVal.style.color = remaining >= 0 ? "var(--green)" : "var(--red)";
+  remSub.textContent = remaining >= 0 ? "remaining" : "over budget!";
+  remCard.style.background = remaining >= 0 ? "#0f1e18" : "#1e0f0f";
+  remCard.style.borderColor = remaining >= 0 ? "#1a3328" : "#3a1515";
+
+  const pct = Math.min(100, (spent / VARIABLE_BUDGET) * 100);
+  document.getElementById("spend-bar").style.width = pct + "%";
+  document.getElementById("spend-bar").style.background = pct > 100 ? "var(--red)" : "var(--purple)";
+  document.getElementById("spend-label").textContent = `$${fmt(spent)} / $${fmt(VARIABLE_BUDGET)}`;
+
+  const catDiv = document.getElementById("cat-summary");
+  catDiv.innerHTML = SPEND_CATS.map(cat => {
+    const sp = catSpend(cat.id);
+    const p  = Math.min(100, (sp / cat.budget) * 100);
+    const over = p > 100;
+    return `
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span style="font-size:13px">${cat.icon} ${cat.label}</span>
+          <span style="font-size:12px;color:${over ? "var(--red)" : "var(--muted)"}">
+            $${fmtD(sp)} <span style="color:var(--dim)">/ $${cat.budget}</span>
+          </span>
+        </div>
+        <div class="bar-wrap" style="height:5px">
+          <div class="bar-fill" style="height:5px;width:${p}%;background:${over ? "var(--red)" : cat.color}"></div>
+        </div>
+      </div>`;
+  }).join("");
+
+  const savDiv = document.getElementById("savings-summary");
+  savDiv.innerHTML = SAVINGS_GOALS.map(g => {
+    const sv  = savings[g.id] || 0;
+    const pct = Math.min(100, (sv / g.target) * 100);
+    return `
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span style="font-size:13px">${g.icon} ${g.label}</span>
+          <span style="font-size:12px;color:${g.color}">$${fmt(sv)} <span style="color:var(--dim)">/ $${fmt(g.target)}</span></span>
+        </div>
+        <div class="bar-wrap" style="height:5px">
+          <div class="bar-fill" style="height:5px;width:${pct}%;background:${g.color}"></div>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+function renderLog() {
+  const picker = document.getElementById("cat-picker");
+  picker.innerHTML = SPEND_CATS.map(cat => `
+    <button class="cat-btn ${cat.id === selectedCat ? "selected" : ""}"
+      style="--sel-color:${cat.color};--sel-bg:${cat.color}22"
+      onclick="selectCat('${cat.id}')">
+      <div class="cat-icon">${cat.icon}</div>
+      <div class="cat-name" style="${cat.id === selectedCat ? "color:"+cat.color : ""}">${cat.label}</div>
+      <div class="cat-budget">Budget $${cat.budget}</div>
+    </button>`).join("");
+
+  const monthExp = monthlyExpenses();
+  const recentWrap = document.getElementById("recent-wrap");
+  const recentList = document.getElementById("recent-list");
+  if (monthExp.length === 0) {
+    recentWrap.style.display = "none";
+  } else {
+    recentWrap.style.display = "block";
+    recentList.innerHTML = monthExp.slice(0,20).map(e => {
+      const cat = SPEND_CATS.find(c => c.id === e.cat) || SPEND_CATS[6];
+      return `
+        <div class="row">
+          <div class="icon-circle" style="background:${cat.color}22">${cat.icon}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.note}</div>
+            <div style="font-size:11px;color:var(--muted)">${e.date} · ${cat.label}</div>
+          </div>
+          <span style="font-size:14px;font-weight:600;color:${cat.color};flex-shrink:0">$${fmtD(e.amount)}</span>
+          <button class="delete-btn" onclick="deleteExp(${e.id})">×</button>
+        </div>`;
+    }).join("");
+  }
+}
+
+function renderSavings() {
+  const goalsDiv = document.getElementById("savings-goals");
+  goalsDiv.innerHTML = SAVINGS_GOALS.map(g => {
+    const sv  = savings[g.id] || 0;
+    const pct = Math.min(100, (sv / g.target) * 100);
+    const left = g.target - sv;
+    const months = left > 0 ? Math.ceil(left / g.monthly) : 0;
+    return `
+      <div class="card" style="border-color:${g.color}33">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+          <div>
+            <div style="font-size:20px;margin-bottom:4px">${g.icon}</div>
+            <div style="font-size:15px;font-weight:600;color:${g.color}">${g.label}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">$${g.monthly}/month · target $${fmt(g.target)}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:22px;font-weight:700;color:${g.color}">$${fmt(sv)}</div>
+            <div style="font-size:11px;color:var(--muted)">${pct.toFixed(0)}% there</div>
+          </div>
+        </div>
+        <div class="bar-wrap" style="height:8px">
+          <div class="bar-fill" style="height:8px;width:${pct}%;background:${g.color}"></div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px">
+          $${fmt(left)} to go · ~${months} months at current rate
+        </div>
+      </div>`;
+  }).join("");
+
+  const spicker = document.getElementById("saving-picker");
+  spicker.innerHTML = SAVINGS_GOALS.map(g => `
+    <button class="pill-btn" onclick="selectSaving('${g.id}')"
+      style="background:${g.id === selectedSaving ? g.color : "var(--border)"};
+             color:${g.id === selectedSaving ? "#0c0b14" : "#9a92b0"};
+             font-weight:${g.id === selectedSaving ? "600" : "400"}">
+      ${g.icon} ${g.label}
+    </button>`).join("");
+
+  const g = SAVINGS_GOALS.find(g => g.id === selectedSaving);
+  document.getElementById("saving-btn").style.background = g.color;
+  document.getElementById("saving-btn").style.color = "#0c0b14";
+}
+
+function renderHistory() {
+  document.getElementById("history-count").textContent = expenses.length + " transaction" + (expenses.length !== 1 ? "s" : "");
+  const list = document.getElementById("history-list");
+  if (expenses.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>No expenses logged yet</p><small>Tap Log to add your first one</small></div>`;
+    return;
+  }
+  list.innerHTML = expenses.map((e, i) => {
+    const cat = SPEND_CATS.find(c => c.id === e.cat) || SPEND_CATS[6];
+    return `
+      <div class="row">
+        <div class="icon-circle" style="background:${cat.color}22">${cat.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.note}</div>
+          <div style="font-size:11px;color:var(--muted)">${e.date} · ${cat.label}</div>
+        </div>
+        <span style="font-size:14px;font-weight:600;color:${cat.color};flex-shrink:0">$${fmtD(e.amount)}</span>
+        <button class="delete-btn" onclick="deleteExp(${e.id})">×</button>
+      </div>`;
+  }).join("");
+}
+
+function renderAll() {
+  renderHome();
+  renderLog();
+  renderSavings();
+  renderHistory();
+}
+
+function selectCat(id) {
+  selectedCat = id;
+  renderLog();
+}
+
+function selectSaving(id) {
+  selectedSaving = id;
+  renderSavings();
+}
+
+function addExpense() {
+  const amt = parseFloat(document.getElementById("log-amt").value);
+  const note = document.getElementById("log-note").value.trim();
+  if (isNaN(amt) || amt <= 0) { showToast("Enter a valid amount"); return; }
+  const cat = SPEND_CATS.find(c => c.id === selectedCat);
+  expenses.unshift({
+    id: Date.now(),
+    cat: selectedCat,
+    amount: amt,
+    note: note || cat.label,
+    date: new Date().toLocaleDateString("en-AU"),
+    month: getMonthKey(),
+  });
+  save("zia_exp_v3", expenses);
+  document.getElementById("log-amt").value = "";
+  document.getElementById("log-note").value = "";
+  showToast(`$${fmtD(amt)} logged to ${cat.label} ✓`);
+  renderAll();
+}
+
+function addSaving() {
+  const amt = parseFloat(document.getElementById("saving-amt").value);
+  if (isNaN(amt) || amt <= 0) { showToast("Enter a valid amount"); return; }
+  const g = SAVINGS_GOALS.find(g => g.id === selectedSaving);
+  savings[selectedSaving] = (savings[selectedSaving] || 0) + amt;
+  save("zia_sav_v3", savings);
+  document.getElementById("saving-amt").value = "";
+  showToast(`$${fmtD(amt)} added to ${g.label} ✓`);
+  renderAll();
+}
+
+function deleteExp(id) {
+  expenses = expenses.filter(e => e.id !== id);
+  save("zia_exp_v3", expenses);
+  renderAll();
+}
+
+function clearAll() {
+  if (!confirm("Clear all expense history?")) return;
+  expenses = [];
+  save("zia_exp_v3", expenses);
+  renderAll();
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+renderAll();
+</script>
+</body>
+</html>
