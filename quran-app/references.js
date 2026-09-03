@@ -88,6 +88,16 @@ const REFERENCES = [
     url: "https://al-islam.org/ninety-nine-attributes-allah-yasin-t-al-jibouri"
   },
   {
+    title: "Sahih al-Bukhari 6307 (Book of Invocations)",
+    note: "Source for the hadith on the Prophet seeking forgiveness more than seventy times daily; Sahih Muslim carries a parallel narration citing a hundred times. Used in the Dhikr tab's Istighfar deep-dive.",
+    url: "https://sunnah.com/bukhari/80"
+  },
+  {
+    title: "Al-Islam.org — The Tasbih of Fatimah az-Zahra",
+    note: "Reference for the origin, method, and etiquette of Tasbih al-Zahra (34x Allahu Akbar, 33x Alhamdulillah, 33x SubhanAllah), taught by the Prophet to his daughter Fatimah.",
+    url: "https://al-islam.org/tasbih-fatimah-az-zahra-abbas-azizi"
+  },
+  {
     title: "WikiShia / al-islam.org — Dua Jawshan Kabir",
     note: "Referenced for the note on Dua Jawshan Kabir (1,000 names/attributes of God) as a Shia devotional practice that extends beyond the standard 99.",
     url: "https://al-islam.org/reflections-supplication-dua-jawshan-al-kabir-mohammad-ali-shomali/reflections-supplication-dua"

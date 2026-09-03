@@ -158,6 +158,28 @@
   .name-ar-big { font-size: 42px; color: var(--gold); text-align: center; margin-bottom: 4px; }
   .name-en-big { font-size: 15px; font-weight: 700; text-align: center; color: var(--gold); margin-bottom: 12px; }
 
+  .theme-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+  .theme-tag { font-size: 10.5px; background: #16261e; border: 1px solid var(--border); color: #9fc2ac; padding: 4px 10px; border-radius: 999px; }
+
+  .dhikr-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 8px; }
+  .dhikr-ar { font-size: 20px; color: var(--gold); margin-bottom: 3px; }
+  .dhikr-tr { font-size: 13.5px; font-weight: 700; }
+  .dhikr-en { font-size: 11.5px; color: var(--muted); margin-bottom: 6px; }
+  .dhikr-meaning { font-size: 12px; line-height: 1.5; color: #cfe0d6; margin-bottom: 8px; }
+  .dhikr-meta-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .dhikr-meta-chip { font-size: 10.5px; background: #16261e; border: 1px solid var(--green-deep); color: var(--green); padding: 3px 9px; border-radius: 999px; }
+  .reason-item { padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .reason-item:last-child { border-bottom: none; }
+  .reason-num { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: var(--green-deep); color: #eaf3ec; font-size: 11px; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
+  .reason-title { font-size: 13px; font-weight: 600; display: inline; }
+  .reason-detail { font-size: 12px; line-height: 1.5; color: #cfe0d6; margin-top: 4px; margin-left: 28px; }
+  .tasbih-step { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .tasbih-step:last-child { border-bottom: none; }
+  .tasbih-count { font-size: 15px; font-weight: 700; color: var(--gold); width: 34px; flex-shrink: 0; }
+  .tasbih-text { flex: 1; }
+  .tasbih-ar { font-size: 16px; color: var(--gold); }
+  .tasbih-en { font-size: 11px; color: var(--muted); }
+
   .disclaimer-box { background: #241c10; border: 1px solid #4a3a1a; border-radius: 12px; padding: 12px; margin-bottom: 12px; }
   .disclaimer-box p { font-size: 11.5px; line-height: 1.55; color: #e8d9b8; }
   .marja-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
@@ -284,6 +306,7 @@
       <span>🔍</span>
       <input type="text" placeholder="Search by name or number..." oninput="filterSurahs(this.value)">
     </div>
+    <div class="pill-row" id="surah-sort-picker"></div>
     <div id="surah-list"></div>
   </div>
 
@@ -327,6 +350,42 @@
     </div>
     <div class="pill-row" id="name-cat-picker"></div>
     <div class="name-grid" id="name-list"></div>
+  </div>
+
+  <!-- DHIKR -->
+  <div id="screen-dhikr" class="screen">
+    <div class="page-title">
+      <h1>Dhikr</h1>
+      <p>Simple daily remembrance</p>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Featured · Istighfar</div>
+      <div class="dhikr-ar arabic" id="istighfar-ar" style="font-size:26px"></div>
+      <div class="dhikr-tr" id="istighfar-tr" style="font-size:16px"></div>
+      <div class="dhikr-en" id="istighfar-en"></div>
+      <p class="modal-summary" style="margin:8px 0" id="istighfar-root"></p>
+      <p class="modal-summary" id="istighfar-meaning"></p>
+      <div class="card-label" style="margin-top:16px">5 Reasons to Make Istighfar</div>
+      <div id="istighfar-reasons"></div>
+      <div class="info-box" style="margin-top:12px">
+        <div class="info-box-label">How many, and when</div>
+        <p id="istighfar-how"></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Featured · Tasbih al-Zahra <span class="card-label-badge">Shia Practice</span></div>
+      <p class="modal-summary" id="tasbih-intro" style="margin-bottom:10px"></p>
+      <div id="tasbih-steps"></div>
+      <p style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5" id="tasbih-note"></p>
+    </div>
+
+    <div class="page-title" style="padding-top:6px">
+      <h1 style="font-size:19px">Everyday Dhikr</h1>
+      <p>Short phrases for daily life</p>
+    </div>
+    <div id="dhikr-list"></div>
   </div>
 
   <!-- MARJA -->
@@ -493,6 +552,9 @@
   <button class="nav-btn" data-screen="names" onclick="goTo('names')">
     <span class="nav-icon">✨</span><span class="nav-label">Names</span>
   </button>
+  <button class="nav-btn" data-screen="dhikr" onclick="goTo('dhikr')">
+    <span class="nav-icon">📿</span><span class="nav-label">Dhikr</span>
+  </button>
   <button class="nav-btn" data-screen="marja" onclick="goTo('marja')">
     <span class="nav-icon">🕌</span><span class="nav-label">Marja</span>
   </button>
@@ -534,6 +596,7 @@
 <script src="references.js"></script>
 <script src="marja.js"></script>
 <script src="names.js"></script>
+<script src="dhikr.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

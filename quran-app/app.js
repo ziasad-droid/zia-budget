@@ -98,6 +98,7 @@ function goTo(screen) {
   if (screen === "surahs") renderSurahList();
   if (screen === "words") renderWordList();
   if (screen === "names") renderNameList();
+  if (screen === "dhikr") renderDhikr();
   if (screen === "marja") renderMarja();
   if (screen === "todo") renderTodos();
   if (screen === "progress") renderProgress();
@@ -209,11 +210,25 @@ function renderStreak() {
 
 /* ---------------- Surahs ---------------- */
 let surahFilter = "";
+let surahSort = "mushaf";
+const SURAH_SORTS = { mushaf: "Mushaf Order", shortest: "Shortest First", longest: "Longest First" };
+function sortSurahs(setTo) {
+  surahSort = setTo;
+  renderSurahList();
+}
 function renderSurahList() {
+  const pickerWrap = document.getElementById("surah-sort-picker");
+  pickerWrap.innerHTML = Object.entries(SURAH_SORTS).map(([key, label]) => `
+    <button class="pill-btn ${surahSort===key?'pill-active':''}" onclick="sortSurahs('${key}')">${label}</button>`).join("");
+
   const q = surahFilter.toLowerCase();
   const wrap = document.getElementById("surah-list");
-  const filtered = SURAHS.filter(s =>
+  let filtered = SURAHS.filter(s =>
     !q || s.tr.toLowerCase().includes(q) || s.en.toLowerCase().includes(q) || String(s.n) === q);
+  filtered = filtered.slice();
+  if (surahSort === "shortest") filtered.sort((a,b) => a.verses - b.verses);
+  else if (surahSort === "longest") filtered.sort((a,b) => b.verses - a.verses);
+  else filtered.sort((a,b) => a.n - b.n);
   wrap.innerHTML = filtered.map(s => `
     <button class="surah-row" onclick="openSurah(${s.n})">
       <div class="surah-num">${s.n}</div>
@@ -233,11 +248,15 @@ function openSurah(n) {
   const s = SURAHS.find(x => x.n === n);
   document.getElementById("modal-title").textContent = s.tr + " (" + s.ar + ")";
   const shiaHtml = s.shia ? `<div class="info-box"><div class="info-box-label">Shia note</div><p>${escapeHtml(s.shia)}</p></div>` : "";
+  const virtueHtml = s.virtue ? `<div class="info-box"><div class="info-box-label">Virtue &amp; When It's Recited</div><p>${escapeHtml(s.virtue)}</p></div>` : "";
+  const themesHtml = s.themes && s.themes.length ? `<div class="theme-tags">${s.themes.map(t => `<span class="theme-tag">${escapeHtml(t)}</span>`).join("")}</div>` : "";
   document.getElementById("modal-body").innerHTML = `
     <div class="modal-meta">${s.place} · ${s.verses} verses · Surah ${s.n} of 114</div>
     <div class="modal-meaning">"${escapeHtml(s.en)}"</div>
+    ${themesHtml}
     <p class="modal-summary">${escapeHtml(s.summary)}</p>
     ${shiaHtml}
+    ${virtueHtml}
     <label class="check-row" style="margin-top:16px">
       <input type="checkbox" ${state.progress.surahsRead[s.n] ? "checked" : ""} onchange="toggleSurahRead(${s.n}, this.checked)">
       <span class="check-icon">✓</span>
@@ -345,6 +364,47 @@ function toggleNameLearned(n, checked) {
 }
 
 /* ---------------- Marja ---------------- */
+let dhikrRendered = false;
+function renderDhikr() {
+  if (dhikrRendered) return;
+  document.getElementById("istighfar-ar").textContent = ISTIGHFAR_DEEPDIVE.arabic;
+  document.getElementById("istighfar-tr").textContent = ISTIGHFAR_DEEPDIVE.transliteration;
+  document.getElementById("istighfar-en").textContent = ISTIGHFAR_DEEPDIVE.translation;
+  document.getElementById("istighfar-root").innerHTML = `<strong>Root:</strong> ${escapeHtml(ISTIGHFAR_DEEPDIVE.root)}`;
+  document.getElementById("istighfar-meaning").textContent = ISTIGHFAR_DEEPDIVE.meaning;
+  document.getElementById("istighfar-reasons").innerHTML = ISTIGHFAR_DEEPDIVE.reasons.map((r, i) => `
+    <div class="reason-item">
+      <span class="reason-num">${i+1}</span><span class="reason-title">${escapeHtml(r.title)}</span>
+      <div class="reason-detail">${escapeHtml(r.detail)}</div>
+    </div>`).join("");
+  document.getElementById("istighfar-how").textContent = ISTIGHFAR_DEEPDIVE.howMany + " " + ISTIGHFAR_DEEPDIVE.when;
+
+  document.getElementById("tasbih-intro").textContent = TASBIH_ZAHRA.intro;
+  document.getElementById("tasbih-steps").innerHTML = TASBIH_ZAHRA.steps.map(s => `
+    <div class="tasbih-step">
+      <div class="tasbih-count">${s.count}×</div>
+      <div class="tasbih-text">
+        <div class="tasbih-ar arabic">${s.ar}</div>
+        <div class="tasbih-en">${s.tr} — ${escapeHtml(s.en)}</div>
+      </div>
+    </div>`).join("");
+  document.getElementById("tasbih-note").textContent = TASBIH_ZAHRA.note;
+
+  document.getElementById("dhikr-list").innerHTML = DHIKR_LIST.map(d => `
+    <div class="dhikr-card">
+      <div class="dhikr-ar arabic">${d.ar}</div>
+      <div class="dhikr-tr">${d.tr}</div>
+      <div class="dhikr-en">${escapeHtml(d.en)}</div>
+      <div class="dhikr-meaning">${escapeHtml(d.meaning)}</div>
+      <div class="dhikr-meta-row">
+        <span class="dhikr-meta-chip">🔢 ${escapeHtml(d.count)}</span>
+        <span class="dhikr-meta-chip">🕐 ${escapeHtml(d.when)}</span>
+      </div>
+    </div>`).join("");
+
+  dhikrRendered = true;
+}
+
 let marjaRendered = false;
 let topicFilter = "", topicCat = "";
 
