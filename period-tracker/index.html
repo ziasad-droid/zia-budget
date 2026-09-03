@@ -88,6 +88,16 @@
   .phase-hero .phase-name { font-size: 16px; font-weight: 700; margin-top: 14px; }
   .phase-hero .phase-desc { font-size: 12px; margin-top: 6px; line-height: 1.5; opacity: 0.9; }
 
+  .guide-section { margin-bottom: 16px; }
+  .guide-section:last-child { margin-bottom: 0; }
+  .guide-section .gs-head { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+  .guide-body-text { font-size: 12.5px; color: #c9c3dd; line-height: 1.6; }
+  .guide-list { list-style: none; }
+  .guide-list li { font-size: 12.5px; color: #c9c3dd; line-height: 1.55; padding: 3px 0 3px 15px; position: relative; }
+  .guide-list li::before { content: "•"; position: absolute; left: 2px; color: var(--dim); }
+  .guide-limit { font-size: 11px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+  .guide-disclaimer { font-size: 10.5px; color: var(--dim); margin-top: 14px; line-height: 1.5; }
+
   /* calendar */
   .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
   .cal-nav button { font-size: 18px; color: var(--muted); padding: 4px 12px; }
@@ -170,6 +180,13 @@
         <div id="today-log-summary" style="font-size:13px;color:#c9c3dd;margin-bottom:12px">Nothing logged for today yet.</div>
         <button class="btn-primary" style="background:var(--pink);color:#2a1018;margin-bottom:0" onclick="goToLogToday()">Log Today</button>
       </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Phase Guide</div>
+      <div class="pill-row" id="guide-picker"></div>
+      <div id="guide-content"></div>
+      <div class="guide-disclaimer">General wellness information, not medical advice — everyone's body is different, so use this as a starting point rather than a rule.</div>
     </div>
   </div>
 
@@ -387,18 +404,46 @@ const FLOWS = [
 
 const PHASES = {
   menstrual: { name:"Menstrual Phase", color:"#e07b5a", bg:"#2a1015",
-    desc:"Your body is shedding the uterine lining. Rest, iron-rich foods, warmth and gentle movement can ease cramps." },
+    desc:"Your body is shedding the uterine lining. Rest, iron-rich foods, warmth and gentle movement can ease cramps.",
+    body:"Estrogen and progesterone are at their lowest point of the cycle. The thickened uterine lining sheds as your period. Prostaglandins make the uterus contract, which is what causes cramps. Energy and mood often dip in the first day or two, then start to lift as the days go on.",
+    eatDo:["Iron-rich foods — leafy greens, lentils, red meat, tofu","Vitamin C foods to boost iron absorption — citrus, capsicum, kiwi","Warming foods — soups, broths, ginger or cinnamon tea","Magnesium-rich foods for cramps — dark chocolate, nuts, seeds, bananas","Plenty of water to ease bloating"],
+    eatLimit:["excess caffeine and alcohol (can worsen cramps and sleep)","very salty or processed foods (add to bloating)"],
+    selfCare:["Use a heat pack or warm bath for cramps","Prioritise extra sleep and rest when you need it","Gentle stretching if you're up for it","Journal or reflect — many find this a naturally introspective time"],
+    exercise:["Restorative or yin yoga","Easy walking","Light stretching or mobility work","Skip high-intensity training if energy is low — your body is doing a lot of internal work"] },
   follicular: { name:"Follicular Phase", color:"#88d4ab", bg:"#0f1e18",
-    desc:"Estrogen is rising and energy tends to climb. A good window for workouts, new projects and socialising." },
+    desc:"Estrogen is rising and energy tends to climb. A good window for workouts, new projects and socialising.",
+    body:"As your period ends, follicle-stimulating hormone (FSH) prompts follicles to mature in your ovaries. Estrogen climbs steadily, rebuilding the uterine lining and typically bringing rising energy, sharper focus and a lifted mood.",
+    eatDo:["Light, fresh foods — salads, sprouted grains, fresh fruit","Lean protein to support rebuilding energy — eggs, fish, legumes","Fermented foods for gut health — yoghurt, kimchi, sauerkraut","Flaxseeds and pumpkin seeds (early-cycle 'seed cycling')"],
+    eatLimit:[],
+    selfCare:["Good time to plan, set goals or start new projects","Lean into socialising — energy and mood are usually on the rise","Try something creative or mentally challenging"],
+    exercise:["Strength training","Running or cardio intervals","HIIT or dance classes","Your body typically recovers well from higher-intensity training now"] },
   fertile: { name:"Fertile Window", color:"#7ab8e8", bg:"#0f1a26",
-    desc:"You're in your fertile window. Estrogen is near its peak and ovulation is approaching." },
+    desc:"You're in your fertile window. Estrogen is near its peak and ovulation is approaching.",
+    body:"Estrogen peaks, triggering a surge in luteinising hormone (LH) that releases an egg from the ovary — ovulation. Cervical mucus becomes clear and stretchy to help sperm travel, and some people notice a mild one-sided twinge (mittelschmerz), a slight rise in body temperature, or a lift in libido.",
+    eatDo:["Antioxidant-rich foods — berries, leafy greens, colourful vegetables","Zinc-rich foods — pumpkin seeds, seafood, eggs","Fibre-rich foods to help metabolise excess estrogen","Stay well hydrated"],
+    eatLimit:["heavily processed foods — whole foods support hormone balance best here"],
+    selfCare:["Confidence, energy and libido are often at their peak — good timing for important conversations or events","A mild one-sided twinge around ovulation is normal; mention it to a doctor if it's severe or lasts more than a day or two"],
+    exercise:["Keep up strength and cardio work — energy is usually high","Scale back if you notice ovulation discomfort"] },
   ovulation: { name:"Ovulation", color:"#7ab8e8", bg:"#0f1a26",
     desc:"Peak fertility — an egg is likely being released today. Some notice a twinge, higher energy or increased libido." },
   luteal: { name:"Luteal Phase", color:"#c9a0dc", bg:"#1a1526",
-    desc:"Progesterone rises then falls. Mood shifts, bloating or cravings are common in the days before your period." },
+    desc:"Progesterone rises then falls. Mood shifts, bloating or cravings are common in the days before your period.",
+    body:"The ruptured follicle becomes the corpus luteum and releases progesterone, which prepares the uterine lining for a possible pregnancy. If pregnancy doesn't occur, estrogen and progesterone both drop sharply in the final days — this hormonal dip drives PMS symptoms like mood swings, bloating and cravings, and ultimately triggers your next period.",
+    eatDo:["Complex carbs to steady blood sugar and mood — oats, sweet potato, wholegrains","Calcium and magnesium-rich foods to ease PMS — dairy or fortified alternatives, leafy greens, nuts","Vitamin B6-rich foods — chickpeas, bananas, salmon","Small, regular meals to manage cravings and energy dips"],
+    eatLimit:["caffeine, salt and added sugar — all can amplify bloating, irritability and mood swings late in this phase"],
+    selfCare:["Build in downtime and ease expectations of yourself in the last few days","Prioritise sleep and stress management — meditation, journaling, a wind-down routine","Prep period supplies ahead of time so you're not caught out"],
+    exercise:["Moderate movement — pilates, swimming, brisk walking","Gentle strength work is usually still fine early in this phase","Ease off high-intensity training in the final days if you're fatigued"] },
   late: { name:"Period Due / Late", color:"#f4a0b0", bg:"#2a1018",
     desc:"Your period hasn't been logged yet — cycles vary, but if it's very late and unexpected it may be worth noting." },
 };
+
+const PHASE_GUIDE_ORDER = [
+  { key:"menstrual",  label:"Menstrual" },
+  { key:"follicular", label:"Follicular" },
+  { key:"fertile",    label:"Fertile Window" },
+  { key:"luteal",     label:"Luteal" },
+];
+let guideSelected = null;
 
 function load(key, def) {
   try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch { return def; }
@@ -606,6 +651,55 @@ function onboardSave() {
 function goToLogToday() {
   logDraftDate = todayKey();
   goTo("log", document.querySelectorAll(".nav-btn")[2]);
+}
+
+// ---------- PHASE GUIDE ----------
+function currentGuidePhaseKey() {
+  const pred = getPrediction();
+  if (!pred) return null;
+  if (pred.phaseKey === "ovulation") return "fertile";
+  if (pred.phaseKey === "late") return "luteal";
+  return pred.phaseKey;
+}
+
+function selectGuide(key) {
+  guideSelected = key;
+  renderGuide();
+}
+
+function renderGuide() {
+  const cur = currentGuidePhaseKey();
+  if (!guideSelected) guideSelected = cur || "menstrual";
+
+  document.getElementById("guide-picker").innerHTML = PHASE_GUIDE_ORDER.map(g => {
+    const on = guideSelected === g.key;
+    const ph = PHASES[g.key];
+    const isCurrent = cur === g.key;
+    return `<button class="pill-btn ${on?"on":""}" style="${on?`background:${ph.color};color:#171225;font-weight:600`:""}" onclick="selectGuide('${g.key}')">${g.label}${isCurrent?" • now":""}</button>`;
+  }).join("");
+
+  const ph = PHASES[guideSelected];
+  const limitHtml = ph.eatLimit && ph.eatLimit.length
+    ? `<div class="guide-limit"><strong style="color:#9a92b0">Go easy on:</strong> ${ph.eatLimit.join("; ")}</div>` : "";
+
+  document.getElementById("guide-content").innerHTML = `
+    <div class="guide-section">
+      <div class="gs-head" style="color:${ph.color}">🧬 In Your Body</div>
+      <div class="guide-body-text">${ph.body}</div>
+    </div>
+    <div class="guide-section">
+      <div class="gs-head" style="color:${ph.color}">🍽️ Nutrition</div>
+      <ul class="guide-list">${ph.eatDo.map(x=>`<li>${x}</li>`).join("")}</ul>
+      ${limitHtml}
+    </div>
+    <div class="guide-section">
+      <div class="gs-head" style="color:${ph.color}">🧘 Self-Care</div>
+      <ul class="guide-list">${ph.selfCare.map(x=>`<li>${x}</li>`).join("")}</ul>
+    </div>
+    <div class="guide-section">
+      <div class="gs-head" style="color:${ph.color}">🏋️ Movement</div>
+      <ul class="guide-list">${ph.exercise.map(x=>`<li>${x}</li>`).join("")}</ul>
+    </div>`;
 }
 
 // ---------- CALENDAR ----------
@@ -834,6 +928,7 @@ function resetAll() {
 // ---------- render all ----------
 function renderAll() {
   renderToday();
+  renderGuide();
   renderCalendar();
   renderLog(document.activeElement && document.activeElement.id === "log-notes");
   renderInsights();
