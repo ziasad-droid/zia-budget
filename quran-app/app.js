@@ -36,10 +36,12 @@ const CATEGORY_LABELS = {
 const state = {
   profile: load("qm_profile", null),
   todos: load("qm_todos", []),
-  progress: load("qm_progress", { surahsRead: {}, wordsLearned: {}, history: {} }),
+  progress: load("qm_progress", { surahsRead: {}, wordsLearned: {}, namesLearned: {}, history: {} }),
   daily: load("qm_daily", {}),
   screen: "today"
 };
+
+if (state.progress && !state.progress.namesLearned) state.progress.namesLearned = {};
 
 function load(key, fallback) {
   try {
@@ -95,6 +97,7 @@ function goTo(screen) {
   window.scrollTo(0,0);
   if (screen === "surahs") renderSurahList();
   if (screen === "words") renderWordList();
+  if (screen === "names") renderNameList();
   if (screen === "marja") renderMarja();
   if (screen === "todo") renderTodos();
   if (screen === "progress") renderProgress();
@@ -293,6 +296,54 @@ function toggleWordLearned(tr, checked) {
   renderWordList();
 }
 
+/* ---------------- 99 Names ---------------- */
+let nameFilter = "", nameCat = "";
+function renderNameList() {
+  const q = nameFilter.toLowerCase();
+  const wrap = document.getElementById("name-list");
+  const filtered = NAMES_OF_ALLAH.filter(x =>
+    (!q || x.tr.toLowerCase().includes(q) || x.en.toLowerCase().includes(q) || x.meaning.toLowerCase().includes(q)) &&
+    (!nameCat || x.cat === nameCat));
+  wrap.innerHTML = filtered.map(x => `
+    <button class="name-card" onclick="openName(${x.n})">
+      <span class="name-num">${x.n}</span>
+      <div class="name-ar arabic">${x.ar}</div>
+      <div class="name-tr">${x.tr}</div>
+      <div class="name-en">${escapeHtml(x.en)}</div>
+      ${state.progress.namesLearned[x.n] ? '<span class="read-badge">✓</span>' : ''}
+    </button>`).join("");
+  const catWrap = document.getElementById("name-cat-picker");
+  const cats = ["", ...Object.keys(NAME_CATEGORIES)];
+  catWrap.innerHTML = cats.map(c => `
+    <button class="pill-btn ${nameCat===c?'pill-active':''}" onclick="filterNameCat('${c}')">${c ? NAME_CATEGORIES[c] : "All"}</button>`).join("");
+  const learned = Object.keys(state.progress.namesLearned).length;
+  document.getElementById("names-progress-label").textContent = learned + " / 99 learned";
+}
+function filterNames(v) { nameFilter = v; renderNameList(); }
+function filterNameCat(c) { nameCat = c; renderNameList(); }
+
+function openName(n) {
+  const x = NAMES_OF_ALLAH.find(v => v.n === n);
+  document.getElementById("modal-title").textContent = x.n + ". " + x.tr;
+  document.getElementById("modal-body").innerHTML = `
+    <div class="name-ar-big arabic">${x.ar}</div>
+    <div class="name-en-big">${escapeHtml(x.en)}</div>
+    <div class="modal-meta">${NAME_CATEGORIES[x.cat]}</div>
+    <p class="modal-summary" style="margin-bottom:10px">${escapeHtml(x.meaning)}</p>
+    <div class="info-box"><div class="info-box-label">When to call on it</div><p>${escapeHtml(x.invoke)}</p></div>
+    <label class="check-row" style="margin-top:16px">
+      <input type="checkbox" ${state.progress.namesLearned[x.n] ? "checked" : ""} onchange="toggleNameLearned(${x.n}, this.checked)">
+      <span class="check-icon">✓</span>
+      <span class="check-label">Mark as learned</span>
+    </label>`;
+  openModal();
+}
+function toggleNameLearned(n, checked) {
+  if (checked) state.progress.namesLearned[n] = true; else delete state.progress.namesLearned[n];
+  saveProgress();
+  renderNameList();
+}
+
 /* ---------------- Marja ---------------- */
 let marjaRendered = false;
 let topicFilter = "", topicCat = "";
@@ -442,16 +493,19 @@ function addStarterGoals() {
 function renderProgress() {
   const readCount = Object.keys(state.progress.surahsRead).length;
   const learnedCount = Object.keys(state.progress.wordsLearned).length;
+  const namesCount = Object.keys(state.progress.namesLearned).length;
   const doneTodos = state.todos.filter(t => t.done).length;
   const activeDays = Object.keys(state.progress.history).length;
 
   document.getElementById("stat-surahs").textContent = readCount + " / 114";
   document.getElementById("stat-words").textContent = learnedCount + " / " + VOCAB.length;
+  document.getElementById("stat-names").textContent = namesCount + " / 99";
   document.getElementById("stat-goals").textContent = doneTodos + " / " + state.todos.length;
   document.getElementById("stat-days").textContent = activeDays;
 
   document.getElementById("bar-surahs").style.width = (readCount/114*100) + "%";
   document.getElementById("bar-words").style.width = (learnedCount/VOCAB.length*100) + "%";
+  document.getElementById("bar-names").style.width = (namesCount/99*100) + "%";
 
   renderStreak();
   const streakEl = document.getElementById("streak-count-2");
@@ -474,7 +528,7 @@ function renderReferences() {
 
 function resetProgress() {
   if (!confirm("Reset all reading progress, learned words, and streaks? Your to-do list and profile stay.")) return;
-  state.progress = { surahsRead: {}, wordsLearned: {}, history: {} };
+  state.progress = { surahsRead: {}, wordsLearned: {}, namesLearned: {}, history: {} };
   saveProgress();
   renderProgress();
   toast("Progress reset");

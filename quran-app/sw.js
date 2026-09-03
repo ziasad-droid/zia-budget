@@ -1,5 +1,5 @@
-const CACHE = 'quran-and-me-v2';
-const ASSETS = ['./', './index.html', './manifest.json', './data.js', './vocabulary.js', './references.js', './marja.js', './app.js'];
+const CACHE = 'quran-and-me-v3';
+const ASSETS = ['./', './index.html', './manifest.json', './data.js', './vocabulary.js', './references.js', './marja.js', './names.js', './app.js'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));

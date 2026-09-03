@@ -143,11 +143,20 @@
   .ref-item .ref-note { font-size: 11.5px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
   .ref-item a { color: var(--blue); font-size: 11.5px; word-break: break-all; }
 
-  #nav { position: fixed; bottom: 0; left: 0; right: 0; background: #0d1c15; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 9px 0; padding-bottom: calc(9px + env(safe-area-inset-bottom)); z-index: 100; }
-  .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 6px; flex: 1; min-width: 0; }
-  .nav-btn .nav-icon { font-size: 19px; }
-  .nav-btn .nav-label { font-size: 9px; color: var(--muted); font-weight: 400; letter-spacing: 0.02em; white-space: nowrap; }
+  #nav { position: fixed; bottom: 0; left: 0; right: 0; background: #0d1c15; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 8px 0; padding-bottom: calc(8px + env(safe-area-inset-bottom)); z-index: 100; overflow-x: auto; }
+  .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 4px; flex: 1; min-width: 42px; }
+  .nav-btn .nav-icon { font-size: 18px; }
+  .nav-btn .nav-label { font-size: 8.5px; color: var(--muted); font-weight: 400; letter-spacing: 0.01em; white-space: nowrap; }
   .nav-btn.active .nav-label { color: var(--green); font-weight: 600; }
+
+  .name-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .name-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px; text-align: center; position: relative; }
+  .name-num { position: absolute; top: 6px; left: 8px; font-size: 9px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .name-ar { font-size: 21px; color: var(--gold); margin-bottom: 4px; margin-top: 6px; }
+  .name-tr { font-size: 12.5px; font-weight: 600; }
+  .name-en { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .name-ar-big { font-size: 42px; color: var(--gold); text-align: center; margin-bottom: 4px; }
+  .name-en-big { font-size: 15px; font-weight: 700; text-align: center; color: var(--gold); margin-bottom: 12px; }
 
   .disclaimer-box { background: #241c10; border: 1px solid #4a3a1a; border-radius: 12px; padding: 12px; margin-bottom: 12px; }
   .disclaimer-box p { font-size: 11.5px; line-height: 1.55; color: #e8d9b8; }
@@ -294,6 +303,32 @@
     <div class="word-grid" id="word-list"></div>
   </div>
 
+  <!-- NAMES -->
+  <div id="screen-names" class="screen">
+    <div class="page-title" style="display:flex;justify-content:space-between;align-items:flex-end">
+      <div>
+        <h1>99 Names</h1>
+        <p id="names-progress-label">0 / 99 learned</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">How to Make Dhikr with the Names</div>
+      <p class="modal-summary">Pick the name that fits what you're feeling right now — not a random one. Say it slowly, in Arabic if you can, holding its meaning in mind rather than rushing a count. A common practice is reciting a single name 33 or 99 times in one sitting, but even saying it once with real presence is worth more than a hundred said in a rush. Many people pair a name with a specific need: "Ya Razzaq" while making dua for provision, "Ya Shafi" (a related name for healing) while praying for someone sick.</p>
+      <div class="info-box">
+        <div class="info-box-label">Going deeper — Shia practice</div>
+        <p>Beyond these 99, many Shia Muslims recite Dua Jawshan Kabir ("The Great Coat of Mail"), a long supplication naming 1,000 divine attributes across 100 sections, traditionally recited on the nights of Ramadan for protection and closeness to God.</p>
+      </div>
+    </div>
+
+    <div class="search-input-wrap">
+      <span>🔍</span>
+      <input type="text" placeholder="Search names or meanings..." oninput="filterNames(this.value)">
+    </div>
+    <div class="pill-row" id="name-cat-picker"></div>
+    <div class="name-grid" id="name-list"></div>
+  </div>
+
   <!-- MARJA -->
   <div id="screen-marja" class="screen">
     <div class="page-title">
@@ -406,6 +441,11 @@
         <div class="bar-wrap" style="height:6px;margin-top:8px"><div class="bar-fill" id="bar-words" style="height:6px;width:0%"></div></div>
       </div>
       <div class="stat-card">
+        <div class="label">Names Learned</div>
+        <div class="value" id="stat-names">0 / 99</div>
+        <div class="bar-wrap" style="height:6px;margin-top:8px"><div class="bar-fill" id="bar-names" style="height:6px;width:0%"></div></div>
+      </div>
+      <div class="stat-card">
         <div class="label">Goals Completed</div>
         <div class="value" id="stat-goals">0 / 0</div>
       </div>
@@ -450,6 +490,9 @@
   <button class="nav-btn" data-screen="words" onclick="goTo('words')">
     <span class="nav-icon">🔤</span><span class="nav-label">Words</span>
   </button>
+  <button class="nav-btn" data-screen="names" onclick="goTo('names')">
+    <span class="nav-icon">✨</span><span class="nav-label">Names</span>
+  </button>
   <button class="nav-btn" data-screen="marja" onclick="goTo('marja')">
     <span class="nav-icon">🕌</span><span class="nav-label">Marja</span>
   </button>
@@ -490,6 +533,7 @@
 <script src="vocabulary.js"></script>
 <script src="references.js"></script>
 <script src="marja.js"></script>
+<script src="names.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

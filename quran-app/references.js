@@ -76,6 +76,21 @@ const REFERENCES = [
     title: "Al-Khoei Foundation — Taqlid",
     note: "Supplementary reference on the rules and practice of taqlid.",
     url: "https://www.al-khoei.org/Questions/taqlid/"
+  },
+  {
+    title: "MyIslam.org — The 99 Names of Allah",
+    note: "Primary cross-check for the order, transliteration, and numbering of the 99 Names in the Names tab.",
+    url: "https://myislam.org/99-names-of-allah/"
+  },
+  {
+    title: "Al-Islam.org — The Ninety-Nine Attributes of Allah (Yasin T. al-Jibouri)",
+    note: "Shia-authored reference on the 99 Names, used alongside myislam.org to cross-check names in the 60s-70s range where lists vary most.",
+    url: "https://al-islam.org/ninety-nine-attributes-allah-yasin-t-al-jibouri"
+  },
+  {
+    title: "WikiShia / al-islam.org — Dua Jawshan Kabir",
+    note: "Referenced for the note on Dua Jawshan Kabir (1,000 names/attributes of God) as a Shia devotional practice that extends beyond the standard 99.",
+    url: "https://al-islam.org/reflections-supplication-dua-jawshan-al-kabir-mohammad-ali-shomali/reflections-supplication-dua"
   }
 ];
 
