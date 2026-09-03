@@ -95,6 +95,7 @@ function goTo(screen) {
   window.scrollTo(0,0);
   if (screen === "surahs") renderSurahList();
   if (screen === "words") renderWordList();
+  if (screen === "marja") renderMarja();
   if (screen === "todo") renderTodos();
   if (screen === "progress") renderProgress();
   if (screen === "today") renderToday();
@@ -290,6 +291,93 @@ function toggleWordLearned(tr, checked) {
   if (checked) state.progress.wordsLearned[tr] = true; else delete state.progress.wordsLearned[tr];
   saveProgress();
   renderWordList();
+}
+
+/* ---------------- Marja ---------------- */
+let marjaRendered = false;
+let topicFilter = "", topicCat = "";
+
+function renderMarja() {
+  if (!marjaRendered) {
+    document.getElementById("marja-name").textContent = MARJA_INFO.name;
+    document.getElementById("marja-bio").textContent = MARJA_INFO.bio;
+    document.getElementById("marja-links").innerHTML = `
+      <a class="link-chip" href="${MARJA_INFO.officialSite}" target="_blank" rel="noopener">sistani.org</a>
+      <a class="link-chip" href="${MARJA_INFO.askUrl}" target="_blank" rel="noopener">Ask a question</a>`;
+
+    document.getElementById("taqlid-body").textContent = TAQLID_INFO.body;
+    document.getElementById("taqlid-identify").textContent = TAQLID_INFO.identifying;
+    document.getElementById("taqlid-links").innerHTML = `
+      <a class="link-chip" href="${TAQLID_INFO.url}" target="_blank" rel="noopener">Full ruling (Islamic Laws)</a>
+      <a class="link-chip" href="${TAQLID_INFO.westUrl}" target="_blank" rel="noopener">Code for the West</a>`;
+
+    document.getElementById("usul-list").innerHTML = USUL_AL_DIN.map(u => `
+      <div class="foundation-card">
+        <div class="foundation-head">
+          <span class="foundation-num">${u.n}</span>
+          <span class="foundation-name">${u.tr}</span>
+          <span class="foundation-ar arabic">${u.ar}</span>
+        </div>
+        <div class="foundation-en">${escapeHtml(u.en)}</div>
+        <div class="foundation-explain">${escapeHtml(u.explain)}</div>
+      </div>`).join("");
+    document.getElementById("usul-mnemonic").textContent = USUL_MNEMONIC;
+
+    document.getElementById("furu-list").innerHTML = FURU_AL_DIN.map(f => `
+      <div class="foundation-card">
+        <div class="foundation-head">
+          <span class="foundation-num">${f.n}</span>
+          <span class="foundation-name">${f.tr}</span>
+          <span class="foundation-group">${escapeHtml(f.group)}</span>
+          <span class="foundation-ar arabic" style="margin-left:4px">${f.ar}</span>
+        </div>
+        <div class="foundation-en">${escapeHtml(f.en)}</div>
+        <div class="foundation-explain">${escapeHtml(f.explain)}</div>
+      </div>`).join("");
+    document.getElementById("furu-mnemonic").textContent = FURU_MNEMONIC;
+
+    document.getElementById("west-title").textContent = WEST_BOOK.title;
+    document.getElementById("west-desc").textContent = WEST_BOOK.description;
+    document.getElementById("west-links").innerHTML = `
+      <a class="link-chip" href="${WEST_BOOK.mainUrl}" target="_blank" rel="noopener">Read online</a>
+      <a class="link-chip" href="${WEST_BOOK.pdfUrl}" target="_blank" rel="noopener">Download PDF</a>
+      <a class="link-chip" href="${WEST_BOOK.mirrorUrl}" target="_blank" rel="noopener">Mirror (al-islam.org)</a>`;
+    document.getElementById("west-toc").innerHTML = WEST_BOOK.parts.map(p => `
+      <div class="book-part">${escapeHtml(p.part)}</div>
+      ${p.chapters.map(c => `
+        <div class="book-chapter">
+          <span>${escapeHtml(c.title)}</span>
+          <a href="${c.url || WEST_BOOK.mainUrl}" target="_blank" rel="noopener">Read →</a>
+        </div>`).join("")}`).join("");
+
+    const cats = ["", ...new Set(FATWA_TOPICS.map(t => t.cat))];
+    document.getElementById("topic-cat-picker").innerHTML = cats.map(c => `
+      <button class="pill-btn ${topicCat===c?'pill-active':''}" onclick="filterTopicCat('${c.replace(/'/g,"\\'")}')">${c || "All"}</button>`).join("");
+
+    marjaRendered = true;
+  }
+  renderTopicList();
+}
+
+function renderTopicList() {
+  const q = topicFilter.toLowerCase();
+  const filtered = FATWA_TOPICS.filter(t =>
+    (!q || t.title.toLowerCase().includes(q) || t.summary.toLowerCase().includes(q) || t.cat.toLowerCase().includes(q)) &&
+    (!topicCat || t.cat === topicCat));
+  const wrap = document.getElementById("topic-list");
+  wrap.innerHTML = filtered.length ? filtered.map(t => `
+    <div class="topic-item">
+      <div class="topic-cat">${escapeHtml(t.cat)}</div>
+      <div class="topic-title">${escapeHtml(t.title)}</div>
+      <div class="topic-summary">${escapeHtml(t.summary)}</div>
+      <a class="topic-link" href="${t.url}" target="_blank" rel="noopener">See the ruling on sistani.org →</a>
+    </div>`).join("") : `<div class="empty-mini">No topics match "${escapeHtml(topicFilter)}" — try a broader term.</div>`;
+}
+function filterTopics(v) { topicFilter = v; renderTopicList(); }
+function filterTopicCat(c) {
+  topicCat = c;
+  document.querySelectorAll("#topic-cat-picker .pill-btn").forEach(b => b.classList.toggle("pill-active", b.textContent === (c || "All")));
+  renderTopicList();
 }
 
 /* ---------------- To-Do ---------------- */

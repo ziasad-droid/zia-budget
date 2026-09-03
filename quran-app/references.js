@@ -56,6 +56,26 @@ const REFERENCES = [
     title: "Quranica — Quranic Arabic Words",
     note: "Supplementary reference for common Quranic Arabic vocabulary.",
     url: "https://quranica.com/articles/quranic-arabic-words/"
+  },
+  {
+    title: "Sistani.org — Islamic Laws: A Code of Practice for Muslims in the West",
+    note: "Primary source for the Marja tab's book summary, chapter list, and topic index. This app links directly to specific chapters where available.",
+    url: "https://www.sistani.org/english/book/46/"
+  },
+  {
+    title: "Sistani.org — Islamic Laws (general fiqh manual)",
+    note: "Source for general topic descriptions (prayer, purity, divorce, inheritance) in the Marja tab's Rulings & Topics Index.",
+    url: "https://www.sistani.org/english/book/48/"
+  },
+  {
+    title: "IMAM-US.org — What is Taqlid? / What is Marja'iyya?",
+    note: "Reference for the plain-language explanation of taqlid and identifying the most learned jurist.",
+    url: "https://imam-us.org/islamic-awareness/islam-101/what-is-taqlid"
+  },
+  {
+    title: "Al-Khoei Foundation — Taqlid",
+    note: "Supplementary reference on the rules and practice of taqlid.",
+    url: "https://www.al-khoei.org/Questions/taqlid/"
   }
 ];
 

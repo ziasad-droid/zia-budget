@@ -144,10 +144,41 @@
   .ref-item a { color: var(--blue); font-size: 11.5px; word-break: break-all; }
 
   #nav { position: fixed; bottom: 0; left: 0; right: 0; background: #0d1c15; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 9px 0; padding-bottom: calc(9px + env(safe-area-inset-bottom)); z-index: 100; }
-  .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 10px; }
-  .nav-btn .nav-icon { font-size: 20px; }
-  .nav-btn .nav-label { font-size: 9.5px; color: var(--muted); font-weight: 400; letter-spacing: 0.03em; }
+  .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 6px; flex: 1; min-width: 0; }
+  .nav-btn .nav-icon { font-size: 19px; }
+  .nav-btn .nav-label { font-size: 9px; color: var(--muted); font-weight: 400; letter-spacing: 0.02em; white-space: nowrap; }
   .nav-btn.active .nav-label { color: var(--green); font-weight: 600; }
+
+  .disclaimer-box { background: #241c10; border: 1px solid #4a3a1a; border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+  .disclaimer-box p { font-size: 11.5px; line-height: 1.55; color: #e8d9b8; }
+  .marja-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .marja-title { font-size: 11px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .link-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .link-chip { font-size: 11px; background: #16261e; border: 1px solid var(--border); color: var(--blue); padding: 7px 12px; border-radius: 999px; }
+  .foundation-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 8px; }
+  .foundation-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+  .foundation-num { font-size: 11px; color: var(--gold); font-weight: 700; }
+  .foundation-name { font-size: 13.5px; font-weight: 700; }
+  .foundation-ar { font-size: 15px; color: var(--gold); margin-left: auto; }
+  .foundation-en { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .foundation-explain { font-size: 12px; line-height: 1.5; color: #cfe0d6; }
+  .foundation-group { font-size: 9.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; background: #16261e; padding: 2px 8px; border-radius: 999px; }
+  .mnemonic-box { background: #16261e; border: 1px dashed var(--green-deep); border-radius: 12px; padding: 12px; margin: 6px 0 16px; }
+  .mnemonic-box .mnemonic-label { font-size: 10px; color: var(--green); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; font-weight: 700; }
+  .mnemonic-box p { font-size: 12px; line-height: 1.55; color: #cfe0d6; }
+  .book-part { font-size: 11px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.08em; margin: 12px 0 6px; }
+  .book-chapter { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; gap: 8px; }
+  .book-chapter:last-child { border-bottom: none; }
+  .book-chapter a { flex-shrink: 0; font-size: 11px; }
+  .topic-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .topic-item:last-child { border-bottom: none; }
+  .topic-cat { font-size: 9.5px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
+  .topic-title { font-size: 13.5px; font-weight: 600; margin-bottom: 4px; }
+  .topic-summary { font-size: 12px; line-height: 1.5; color: #cfe0d6; margin-bottom: 6px; }
+  .topic-link { font-size: 11px; color: var(--blue); }
+  .install-step { display: flex; gap: 10px; padding: 8px 0; align-items: flex-start; }
+  .install-step-num { width: 20px; height: 20px; border-radius: 50%; background: var(--green-deep); color: #eaf3ec; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .install-step p { font-size: 12.5px; line-height: 1.5; color: #cfe0d6; }
 
   #toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--green); color: #08150f; padding: 10px 20px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; opacity: 0; transition: all 0.2s ease; z-index: 999; pointer-events: none; }
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -263,6 +294,70 @@
     <div class="word-grid" id="word-list"></div>
   </div>
 
+  <!-- MARJA -->
+  <div id="screen-marja" class="screen">
+    <div class="page-title">
+      <h1>Your Marja</h1>
+      <p>Sayyid Sistani — rulings, foundations &amp; memorization</p>
+    </div>
+
+    <div class="disclaimer-box">
+      <p>⚠️ This tab is a study index, not a fatwa database. Summaries here are general and may simplify nuance. Always confirm the exact, current ruling at <a href="https://www.sistani.org/english/" target="_blank" rel="noopener">sistani.org</a> — this app is independent and not affiliated with the Office of Sistani.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-label">About Your Marja</div>
+      <div class="marja-name" id="marja-name"></div>
+      <div class="marja-title">Marja' al-Taqlid</div>
+      <p class="modal-summary" id="marja-bio"></p>
+      <div class="link-row" id="marja-links"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">What Is Taqlid?</div>
+      <p class="modal-summary" id="taqlid-body" style="margin-bottom:10px"></p>
+      <p class="modal-summary" id="taqlid-identify"></p>
+      <div class="link-row" id="taqlid-links"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Foundations · Usul al-Din <span class="card-label-badge">Belief</span></div>
+      <div id="usul-list"></div>
+      <div class="mnemonic-box">
+        <div class="mnemonic-label">🧠 Memorize it</div>
+        <p id="usul-mnemonic"></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Foundations · Furu al-Din <span class="card-label-badge">Practice</span></div>
+      <div id="furu-list"></div>
+      <div class="mnemonic-box">
+        <div class="mnemonic-label">🧠 Memorize it</div>
+        <p id="furu-mnemonic"></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Book · Muslims in the West</div>
+      <div class="marja-name" id="west-title" style="font-size:14px"></div>
+      <p class="modal-summary" id="west-desc"></p>
+      <div class="link-row" id="west-links"></div>
+      <div id="west-toc"></div>
+    </div>
+
+    <div class="page-title" style="padding-top:6px">
+      <h1 style="font-size:19px">Rulings &amp; Topics Index</h1>
+      <p>Search by topic, category, or keyword</p>
+    </div>
+    <div class="search-input-wrap">
+      <span>🔍</span>
+      <input type="text" placeholder="e.g. khums, marriage, fasting..." oninput="filterTopics(this.value)">
+    </div>
+    <div class="pill-row" id="topic-cat-picker"></div>
+    <div class="card" id="topic-list"></div>
+  </div>
+
   <!-- TODO -->
   <div id="screen-todo" class="screen">
     <div class="page-title">
@@ -323,6 +418,15 @@
     <button class="btn-secondary" onclick="resetProgress()">Reset progress</button>
 
     <div class="card">
+      <div class="card-label">Add to Home Screen</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:8px">On iPhone or iPad, in <strong>Safari</strong> (not Chrome):</p>
+      <div class="install-step"><div class="install-step-num">1</div><p>Tap the <strong>Share</strong> icon (square with an arrow) in the toolbar.</p></div>
+      <div class="install-step"><div class="install-step-num">2</div><p>Scroll down and tap <strong>Add to Home Screen</strong>.</p></div>
+      <div class="install-step"><div class="install-step-num">3</div><p>Tap <strong>Add</strong> — the icon appears on your home screen like any other app.</p></div>
+      <p style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">For the best experience (opens full-screen, no browser bar), install from the version hosted on GitHub Pages rather than this preview link — ask if you'd like help setting that up.</p>
+    </div>
+
+    <div class="card">
       <div class="card-label">About this app</div>
       <p style="font-size:12.5px;line-height:1.6;color:#cfe0d6">Quran &amp; Me is a personal study companion — not a substitute for a qualified teacher or scholar (marja'). Please verify rulings and deeper theological points with a trusted 'alim.</p>
     </div>
@@ -345,6 +449,9 @@
   </button>
   <button class="nav-btn" data-screen="words" onclick="goTo('words')">
     <span class="nav-icon">🔤</span><span class="nav-label">Words</span>
+  </button>
+  <button class="nav-btn" data-screen="marja" onclick="goTo('marja')">
+    <span class="nav-icon">🕌</span><span class="nav-label">Marja</span>
   </button>
   <button class="nav-btn" data-screen="todo" onclick="goTo('todo')">
     <span class="nav-icon">✅</span><span class="nav-label">To-Do</span>
@@ -382,6 +489,7 @@
 <script src="data.js"></script>
 <script src="vocabulary.js"></script>
 <script src="references.js"></script>
+<script src="marja.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
