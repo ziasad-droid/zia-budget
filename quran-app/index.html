@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Quran & Me">
+<title>Quran &amp; Me</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a1712;
+    --card: #10231a;
+    --border: #1c3229;
+    --text: #eaf3ec;
+    --muted: #6f8f7d;
+    --dim: #3f5c4d;
+    --green: #5fae82;
+    --green-deep: #3d7a5c;
+    --gold: #d4af6a;
+    --red: #e07b5a;
+    --blue: #7ab8e8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', system-ui, sans-serif; overflow-x: hidden; }
+  body { padding-bottom: env(safe-area-inset-bottom); }
+  button { font-family: inherit; cursor: pointer; border: none; outline: none; background: none; color: inherit; }
+  input, textarea { font-family: inherit; outline: none; border: none; background: transparent; color: var(--text); }
+  input::placeholder, textarea::placeholder { color: var(--dim); }
+  .arabic { font-family: 'Amiri', serif; direction: rtl; }
+
+  #app { max-width: 480px; margin: 0 auto; padding: 0 16px; }
+
+  .screen { display: none; padding-top: 4px; padding-bottom: 110px; animation: slideUp 0.2s ease; }
+  .screen.active { display: block; }
+  @keyframes slideUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+  .page-title { padding: 22px 0 14px; }
+  .page-title .eyebrow { font-size: 11px; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+  .page-title h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.4px; }
+  .page-title p { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+  .card-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center; }
+  .card-label-badge { background: var(--green-deep); color: #eaf3ec; padding: 2px 8px; border-radius: 999px; font-size: 10px; }
+
+  .streak-banner { display:flex; align-items:center; justify-content:space-between; background: linear-gradient(135deg, #16321f, #0f2a1f); border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; margin-bottom: 12px; }
+  .streak-num { font-size: 26px; font-weight: 700; color: var(--gold); }
+  .streak-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  .surah-hero-ar { font-size: 30px; text-align: right; color: var(--gold); margin-bottom: 4px; }
+  .surah-hero-title { font-size: 19px; font-weight: 700; }
+  .surah-hero-meta { font-size: 11px; color: var(--muted); margin: 4px 0 10px; }
+  .surah-hero-summary { font-size: 13px; line-height: 1.55; color: #cfe0d6; }
+
+  .info-box { background: #16261e; border: 1px solid var(--green-deep); border-radius: 12px; padding: 12px; margin-top: 12px; }
+  .info-box-label { font-size: 10px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; font-weight: 700; }
+  .info-box p { font-size: 12.5px; line-height: 1.55; color: #cfe0d6; }
+
+  .word-hero-ar { font-size: 34px; text-align: center; color: var(--gold); margin-bottom: 4px; }
+  .word-hero-tr { font-size: 17px; font-weight: 700; text-align: center; }
+  .word-hero-ref { font-size: 11px; color: var(--muted); text-align: center; margin: 2px 0 10px; }
+  .word-hero-meaning { font-size: 13px; line-height: 1.55; color: #cfe0d6; }
+
+  .reflection-text { font-size: 14px; line-height: 1.6; font-style: italic; color: #dcead2; }
+
+  .check-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .check-row:last-child { border-bottom: none; }
+  .check-row input[type=checkbox] { width: 19px; height: 19px; accent-color: var(--green); flex-shrink: 0; }
+  .check-icon { font-size: 16px; flex-shrink: 0; }
+  .check-label { font-size: 13.5px; flex: 1; }
+
+  .bar-wrap { background: #1c3229; border-radius: 999px; overflow: hidden; }
+  .bar-fill { border-radius: 999px; transition: width 0.4s ease; background: var(--green); }
+
+  textarea#today-note { width: 100%; min-height: 70px; font-size: 13.5px; line-height: 1.5; resize: vertical; }
+
+  .btn-primary { width: 100%; padding: 15px; border-radius: 14px; font-size: 15px; font-weight: 700; margin-bottom: 12px; transition: opacity 0.15s, transform 0.1s; background: var(--green); color: #08150f; }
+  .btn-primary:active { opacity: 0.8; transform: scale(0.98); }
+  .btn-secondary { width: 100%; padding: 13px; border-radius: 14px; font-size: 13px; font-weight: 600; background: #16261e; color: var(--muted); border: 1px solid var(--border); }
+
+  .empty-mini { font-size: 12.5px; color: var(--muted); padding: 10px 0; }
+
+  .search-input-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .search-input-wrap input { flex: 1; font-size: 14px; }
+
+  .surah-row { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 10px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px; text-align: left; position: relative; }
+  .surah-num { width: 28px; height: 28px; border-radius: 8px; background: #16261e; color: var(--gold); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .surah-info { flex: 1; min-width: 0; }
+  .surah-title { font-size: 13.5px; font-weight: 600; }
+  .surah-en { font-weight: 400; color: var(--muted); }
+  .surah-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .surah-ar { font-size: 16px; color: var(--gold); flex-shrink: 0; }
+  .read-badge { position: absolute; top: 8px; right: 8px; background: var(--green); color: #08150f; width: 16px; height: 16px; border-radius: 50%; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
+  .pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px; }
+  .pill-btn { padding: 7px 13px; border-radius: 999px; font-size: 11.5px; background: var(--card); border: 1px solid var(--border); color: var(--muted); white-space: nowrap; }
+  .pill-active { background: var(--green-deep); color: #eaf3ec; border-color: var(--green-deep); }
+
+  .word-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .word-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px; text-align: center; position: relative; }
+  .word-ar { font-size: 20px; color: var(--gold); margin-bottom: 4px; }
+  .word-tr { font-size: 12.5px; font-weight: 600; }
+  .word-cat-tag { font-size: 9.5px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .word-ar-big { font-size: 40px; color: var(--gold); text-align: center; margin-bottom: 6px; }
+  .modal-meta { font-size: 11px; color: var(--muted); text-align: center; margin-bottom: 12px; }
+  .modal-meaning { font-size: 14px; font-weight: 600; text-align: center; margin-bottom: 10px; color: var(--gold); }
+  .modal-summary { font-size: 13.5px; line-height: 1.6; color: #cfe0d6; }
+
+  .row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); gap: 10px; }
+  .row:last-child { border-bottom: none; }
+  .todo-item input[type=checkbox] { width: 19px; height: 19px; accent-color: var(--green); flex-shrink: 0; }
+  .todo-text { flex: 1; font-size: 13.5px; }
+  .todo-text div:first-child { margin-bottom: 2px; }
+  .todo-cat { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .todo-done div:first-child { text-decoration: line-through; color: var(--dim); }
+  .todo-divider { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; padding: 14px 0 4px; }
+  .delete-btn { color: var(--dim); font-size: 20px; padding: 2px 6px; flex-shrink: 0; }
+  .delete-btn:active { color: var(--red); }
+
+  .add-todo-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .add-todo-row input[type=text] { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; font-size: 13.5px; }
+  .add-todo-row select { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 10px; font-size: 12px; color: var(--muted); }
+  .add-todo-btn { background: var(--green); color: #08150f; width: 44px; border-radius: 12px; font-size: 20px; font-weight: 700; flex-shrink: 0; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+  .stat-card .label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+  .stat-card .value { font-size: 20px; font-weight: 700; color: var(--gold); }
+
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); }
+  .empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+  .empty-state small { font-size: 12px; margin-top: 4px; display: block; }
+
+  .ref-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-item .ref-title { font-size: 13px; font-weight: 600; }
+  .ref-item .ref-note { font-size: 11.5px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+  .ref-item a { color: var(--blue); font-size: 11.5px; word-break: break-all; }
+
+  #nav { position: fixed; bottom: 0; left: 0; right: 0; background: #0d1c15; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 9px 0; padding-bottom: calc(9px + env(safe-area-inset-bottom)); z-index: 100; }
+  .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 10px; }
+  .nav-btn .nav-icon { font-size: 20px; }
+  .nav-btn .nav-label { font-size: 9.5px; color: var(--muted); font-weight: 400; letter-spacing: 0.03em; }
+  .nav-btn.active .nav-label { color: var(--green); font-weight: 600; }
+
+  #toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--green); color: #08150f; padding: 10px 20px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; opacity: 0; transition: all 0.2s ease; z-index: 999; pointer-events: none; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  #modal-overlay { position: fixed; inset: 0; background: rgba(5,12,9,0.75); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
+  #modal-overlay.show { display: flex; }
+  #modal-sheet { background: var(--bg); border: 1px solid var(--border); border-radius: 20px 20px 0 0; width: 100%; max-width: 480px; max-height: 82vh; overflow-y: auto; padding: 20px 18px calc(24px + env(safe-area-inset-bottom)); }
+  #modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 10px; }
+  #modal-title { font-size: 18px; font-weight: 700; }
+  #modal-close { font-size: 22px; color: var(--muted); flex-shrink: 0; }
+
+  #onboarding { position: fixed; inset: 0; background: var(--bg); z-index: 300; display: none; flex-direction: column; justify-content: center; padding: 24px; }
+  #onboarding.show { display: flex; }
+  .ob-emoji { font-size: 46px; text-align: center; margin-bottom: 14px; }
+  .ob-title { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+  .ob-sub { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 28px; line-height: 1.5; }
+  .ob-field-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+  #onboarding input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; font-size: 15px; margin-bottom: 18px; }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- TODAY -->
+  <div id="screen-today" class="screen active">
+    <div class="page-title">
+      <div class="eyebrow" id="today-date"></div>
+      <h1 id="greeting">Quran &amp; Me</h1>
+      <p id="day-number"></p>
+    </div>
+
+    <div class="streak-banner">
+      <div>
+        <div class="streak-label">Current streak</div>
+        <div class="streak-num"><span id="streak-count">0</span> 🔥</div>
+      </div>
+      <div style="text-align:right;flex:1;max-width:140px">
+        <div class="bar-wrap" style="height:8px;margin-bottom:6px"><div class="bar-fill" id="today-progress-fill" style="height:8px;width:0%"></div></div>
+        <div style="font-size:11px;color:var(--muted)" id="today-progress-label">0 / 5 today</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Today's Surah <span class="card-label-badge">Workbook</span></div>
+      <div class="surah-hero-ar arabic" id="today-surah-ar"></div>
+      <div class="surah-hero-title" id="today-surah-name"></div>
+      <div class="surah-hero-meta" id="today-surah-meta"></div>
+      <p class="surah-hero-summary" id="today-surah-summary"></p>
+      <div class="info-box" id="today-surah-shia" style="display:none">
+        <div class="info-box-label">Shia Note</div>
+        <p></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Word of the Day</div>
+      <div class="word-hero-ar arabic" id="today-word-ar"></div>
+      <div class="word-hero-tr" id="today-word-tr"></div>
+      <div class="word-hero-ref" id="today-word-ref"></div>
+      <p class="word-hero-meaning" id="today-word-meaning"></p>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Reflection Prompt</div>
+      <p class="reflection-text" id="today-reflection"></p>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Today's Checklist</div>
+      <div id="today-checklist"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Open Goals</div>
+      <div id="today-todo-preview"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Journal</div>
+      <textarea id="today-note" placeholder="A line or two about what today's reading meant to you..." oninput="clearTimeout(window.__noteT); window.__noteT=setTimeout(saveNote, 600)"></textarea>
+    </div>
+  </div>
+
+  <!-- SURAHS -->
+  <div id="screen-surahs" class="screen">
+    <div class="page-title" style="display:flex;justify-content:space-between;align-items:flex-end">
+      <div>
+        <h1>Surahs</h1>
+        <p id="surah-progress-label">0 / 114 read</p>
+      </div>
+    </div>
+    <div class="search-input-wrap">
+      <span>🔍</span>
+      <input type="text" placeholder="Search by name or number..." oninput="filterSurahs(this.value)">
+    </div>
+    <div id="surah-list"></div>
+  </div>
+
+  <!-- WORDS -->
+  <div id="screen-words" class="screen">
+    <div class="page-title" style="display:flex;justify-content:space-between;align-items:flex-end">
+      <div>
+        <h1>Vocabulary</h1>
+        <p id="word-progress-label">0 / 120 learned</p>
+      </div>
+    </div>
+    <div class="search-input-wrap">
+      <span>🔍</span>
+      <input type="text" placeholder="Search words or meanings..." oninput="filterWords(this.value)">
+    </div>
+    <div class="pill-row" id="word-cat-picker"></div>
+    <div class="word-grid" id="word-list"></div>
+  </div>
+
+  <!-- TODO -->
+  <div id="screen-todo" class="screen">
+    <div class="page-title">
+      <h1>To-Do &amp; Goals</h1>
+      <p>Your personal Quran learning plan</p>
+    </div>
+    <div class="add-todo-row">
+      <input type="text" id="todo-input" placeholder="Add a goal or task..." onkeydown="if(event.key==='Enter')addTodo()">
+      <select id="todo-cat-input">
+        <option>General</option>
+        <option>Memorization</option>
+        <option>Reading</option>
+        <option>Vocabulary</option>
+        <option>Habit</option>
+        <option>Reflection</option>
+      </select>
+      <button class="add-todo-btn" onclick="addTodo()">+</button>
+    </div>
+    <button class="btn-secondary" style="margin-bottom:16px" onclick="addStarterGoals()">✨ Add starter goals</button>
+    <div class="card" id="todo-list"></div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div id="screen-progress" class="screen">
+    <div class="page-title">
+      <h1>Progress</h1>
+      <p>Your journey so far</p>
+    </div>
+
+    <div class="streak-banner">
+      <div>
+        <div class="streak-label">Current streak</div>
+        <div class="streak-num"><span id="streak-count-2">0</span> 🔥 days</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="stat-card">
+        <div class="label">Surahs Read</div>
+        <div class="value" id="stat-surahs">0 / 114</div>
+        <div class="bar-wrap" style="height:6px;margin-top:8px"><div class="bar-fill" id="bar-surahs" style="height:6px;width:0%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Words Learned</div>
+        <div class="value" id="stat-words">0 / 120</div>
+        <div class="bar-wrap" style="height:6px;margin-top:8px"><div class="bar-fill" id="bar-words" style="height:6px;width:0%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Goals Completed</div>
+        <div class="value" id="stat-goals">0 / 0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Active Days</div>
+        <div class="value" id="stat-days">0</div>
+      </div>
+    </div>
+
+    <button class="btn-secondary" onclick="resetProgress()">Reset progress</button>
+
+    <div class="card">
+      <div class="card-label">About this app</div>
+      <p style="font-size:12.5px;line-height:1.6;color:#cfe0d6">Quran &amp; Me is a personal study companion — not a substitute for a qualified teacher or scholar (marja'). Please verify rulings and deeper theological points with a trusted 'alim.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Sources &amp; References</div>
+      <div id="reference-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div id="nav">
+  <button class="nav-btn active" data-screen="today" onclick="goTo('today')">
+    <span class="nav-icon">🌙</span><span class="nav-label">Today</span>
+  </button>
+  <button class="nav-btn" data-screen="surahs" onclick="goTo('surahs')">
+    <span class="nav-icon">📖</span><span class="nav-label">Surahs</span>
+  </button>
+  <button class="nav-btn" data-screen="words" onclick="goTo('words')">
+    <span class="nav-icon">🔤</span><span class="nav-label">Words</span>
+  </button>
+  <button class="nav-btn" data-screen="todo" onclick="goTo('todo')">
+    <span class="nav-icon">✅</span><span class="nav-label">To-Do</span>
+  </button>
+  <button class="nav-btn" data-screen="progress" onclick="goTo('progress')">
+    <span class="nav-icon">📊</span><span class="nav-label">Progress</span>
+  </button>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div id="modal-sheet">
+    <div id="modal-header">
+      <div id="modal-title"></div>
+      <button id="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- ONBOARDING -->
+<div id="onboarding">
+  <div class="ob-emoji">🌙</div>
+  <div class="ob-title">Assalamu alaikum</div>
+  <div class="ob-sub">Welcome to your personal Quran companion. Let's set up your daily workbook — a new surah and word each day, a reflection prompt, and a place for your own goals.</div>
+  <div class="ob-field-label">Your name</div>
+  <input type="text" id="ob-name" placeholder="e.g. Zia">
+  <div class="ob-field-label">Reading goal (minutes/day)</div>
+  <input type="number" id="ob-goal" placeholder="10" value="10">
+  <button class="btn-primary" onclick="completeOnboarding()">Start my journey</button>
+</div>
+
+<div id="toast"></div>
+
+<script src="data.js"></script>
+<script src="vocabulary.js"></script>
+<script src="references.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

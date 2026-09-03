@@ -1,0 +1,64 @@
+/* ===================================================================
+   Quran & Me — References
+   Sources consulted while compiling surah summaries, Shia notes, and
+   the vocabulary glossary in this app. Shown in full inside the app
+   (Progress tab) so every user can see exactly where the content
+   comes from.
+   =================================================================== */
+
+const REFERENCES = [
+  {
+    title: "Tafsir al-Mizan — Sayyid Muhammad Husayn Tabataba'i",
+    note: "The primary modern Shia exegesis of the Quran (27 volumes), used as the main grounding for Shia theological notes on verses such as the Verse of Purification (33:33), the Verse of Wilayah (5:55), and Surah Al-Insan.",
+    url: "https://al-islam.org/al-mizan-exegesis-quran-sayyid-muhammad-husayn-tabatabai"
+  },
+  {
+    title: "Al-Islam.org — Ahlul Bayt Digital Islamic Library Project",
+    note: "General Shia reference library used for surah context, tafsir excerpts, and the lives of the Prophet and Ahl al-Bayt.",
+    url: "https://al-islam.org"
+  },
+  {
+    title: "WikiShia — Shia Encyclopedia",
+    note: "Used to cross-check Shia narrations on individual surahs, including Sura al-Insan and the events behind key verses.",
+    url: "https://en.wikishia.net"
+  },
+  {
+    title: "Imam Ali Foundation (imamali.net)",
+    note: "Articles on the revelation circumstances of verses connected to Imam Ali and the Ahl al-Bayt, including the Verse of Wilayah and Surah Al-Insan.",
+    url: "https://en.imamali.net"
+  },
+  {
+    title: "Mahajjah — Shia Beliefs Series",
+    note: "Reference for the doctrine of Wilayah and the Verse of Wilayah (5:55).",
+    url: "https://mahajjah.com"
+  },
+  {
+    title: "List of chapters in the Quran (general reference)",
+    note: "Cross-checked for the standard order, Meccan/Medinan classification, and verse counts of all 114 surahs, which are consistent across Sunni and Shia mushafs.",
+    url: "https://en.wikipedia.org/wiki/List_of_chapters_in_the_Quran"
+  },
+  {
+    title: "Quran.com",
+    note: "General reference for Quran text, translations (including Sahih International and others) and surah metadata.",
+    url: "https://quran.com"
+  },
+  {
+    title: "Corpus Quran — Quranic Arabic Corpus",
+    note: "Referenced for Arabic root and word-level meanings used in the vocabulary glossary.",
+    url: "https://corpus.quran.com"
+  },
+  {
+    title: "Glossary of Islamic terms in Arabic",
+    note: "General cross-reference for definitions of core terms (taqwa, tawakkul, tawhid, and others) in the vocabulary list.",
+    url: "https://islam.fandom.com/wiki/Glossary_of_Islamic_terms_in_Arabic"
+  },
+  {
+    title: "Quranica — Quranic Arabic Words",
+    note: "Supplementary reference for common Quranic Arabic vocabulary.",
+    url: "https://quranica.com/articles/quranic-arabic-words/"
+  }
+];
+
+const REFERENCES_NOTE = "Facts shared by all schools (surah names, order, verse counts, revelation place) are drawn from standard, widely-agreed sources. Historical/interpretive notes marked 'Shia note' throughout the app draw specifically on Shia tafsir and hadith literature, led by Tafsir al-Mizan and al-islam.org, per the app owner's request to lean toward Shia scholarship where available. This app is a personal study aid compiled with AI assistance — always verify rulings and deeper points with a qualified scholar.";
+
+if (typeof module !== "undefined") module.exports = { REFERENCES, REFERENCES_NOTE };
